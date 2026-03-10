@@ -1,0 +1,31 @@
+name: default_us_privacy
+description: Baseline US-oriented policy for general AI workloads.
+allowed_regions:
+  - us-east-1
+  - us-west-2
+  - us-central1
+sensitive_data_types:
+  - ssn
+  - health_records
+  - payment_card
+  - biometric
+trusted_providers:
+  - openai
+  - azure_openai
+  - anthropic
+high_risk_use_cases:
+  - medical_diagnosis
+  - credit_underwriting
+  - legal_advice
+required_metadata_fields:
+  - provider
+  - model
+  - deployment_region
+  - use_case
+weights:
+  pii_in_prompt_sample: 15
+  sensitive_data: 20
+  third_party_transfer: 15
+  retention_risk: 15
+  region_policy_mismatch: 20
+  missing_metadata: 15
