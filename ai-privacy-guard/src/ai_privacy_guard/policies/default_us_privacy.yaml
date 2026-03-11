@@ -1,31 +1,19 @@
 name: default_us_privacy
-description: Baseline US-oriented policy for general AI workloads.
-allowed_regions:
-  - us-east-1
-  - us-west-2
-  - us-central1
-sensitive_data_types:
-  - ssn
-  - health_records
-  - payment_card
-  - biometric
-trusted_providers:
-  - openai
-  - azure_openai
-  - anthropic
-high_risk_use_cases:
-  - medical_diagnosis
-  - credit_underwriting
-  - legal_advice
-required_metadata_fields:
-  - provider
-  - model
-  - deployment_region
-  - use_case
-weights:
-  pii_in_prompt_sample: 15
-  sensitive_data: 20
-  third_party_transfer: 15
-  retention_risk: 15
-  region_policy_mismatch: 20
-  missing_metadata: 15
+version: 1
+description: >
+  Baseline US privacy policy pack focused on developer-declared data types
+  and third-party model providers.
+rules:
+  - rule_id: US.SENSITIVE.THIRD_PARTY.HIGH_RISK
+    title: High-risk sensitive data shared with third-party provider
+    description: >
+      Triggers when developer-declared high-risk sensitive data types are
+      sent to a known third-party model provider.
+    check: sensitive_data_check
+    severity: high
+    enforcement: block
+    recommendations:
+      - Avoid sending high-risk sensitive data to third-party model providers.
+      - Replace direct identifiers with redacted or tokenized values.
+      - Route this use case through an approved self-hosted or isolated path.
+    enabled: true

@@ -3,8 +3,8 @@
   "model": "gpt-4.1",
   "deployment_region": "us-east-1",
   "data_types": [
-    "product_feedback",
-    "email"
+    "health_info",
+    "product_feedback"
   ],
   "stores_prompts": true,
   "stores_outputs": false,

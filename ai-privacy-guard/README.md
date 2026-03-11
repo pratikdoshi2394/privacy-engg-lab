@@ -1,21 +1,18 @@
 # ai-privacy-guard
 
-`ai-privacy-guard` is a policy-driven privacy risk evaluator for AI application configs.
-It accepts a JSON deployment config, runs modular checks, and returns a standardized JSON risk report.
+`ai-privacy-guard` is a policy-driven privacy scanner MVP for AI applications.
+This first version focuses on developer-declared `data_types` and evaluates them
+against YAML policy packs to produce evidence-backed findings.
 
-## Features
+## MVP Scope
 
-- `src/` layout package with clean module boundaries
-- CLI entrypoint: `apg`
-- Policy-driven risk scoring from YAML profiles
-- Structured output: `risk_score`, `findings[]`, `summary`
-- Placeholder checks for:
-  - `pii_in_prompt_sample`
-  - `sensitive_data`
-  - `third_party_transfer`
-  - `retention_risk`
-  - `region_policy_mismatch`
-  - `missing_metadata`
+- Policy-driven scanner architecture
+- Developer-declared data types as v1 source of truth
+- Rule evaluation with check registry dispatch
+- Evidence-backed findings with policy-defined recommendations
+- Enforcement metadata per finding (`monitor`, `warn`, `block`)
+
+No runtime prompt scanning is implemented yet.
 
 ## Install
 
@@ -23,24 +20,19 @@ It accepts a JSON deployment config, runs modular checks, and returns a standard
 cd ai-privacy-guard
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install .[dev]
 ```
 
-For tests:
+## Configuration Input
 
-```bash
-pip install -e .[dev]
-pytest
-```
-
-## Input Contract
-
-Required JSON fields:
+`apg` accepts a JSON config. Required fields for v1:
 
 - `provider`
+- `data_types`
+
+Supported optional fields include:
 - `model`
 - `deployment_region`
-- `data_types`
 - `stores_prompts`
 - `stores_outputs`
 - `end_users`
@@ -48,66 +40,80 @@ Required JSON fields:
 
 See [`examples/sample_config.json`](examples/sample_config.json).
 
+## Policy Packs
+
+Policy files live under `src/ai_privacy_guard/policies/`.
+
+The default pack (`default_us_privacy.yaml`) defines rules with:
+- `rule_id`
+- `title`
+- `check`
+- `severity`
+- `enforcement`
+- `recommendations`
+
 ## CLI Usage
 
 ```bash
 apg --config examples/sample_config.json
 ```
 
-Use a specific policy profile:
+Use a named policy pack:
 
 ```bash
-apg --config examples/sample_config.json --policy financial_services
+apg --config examples/sample_config.json --policy default_us_privacy
 ```
 
-## Example Output
-
-```json
-{
-  "risk_score": 22,
-  "findings": [
-    {
-      "check": "pii_in_prompt_sample",
-      "score": 15,
-      "severity": "high",
-      "passed": false,
-      "detail": "PII-like fields were declared, and prompts are stored."
-    }
-  ],
-  "summary": "Overall low privacy risk (score=22) with 2 flagged checks out of 6."
-}
-```
-
-## Python API
+## Python Usage
 
 ```python
-from ai_privacy_guard.engine import RiskEngine
+from ai_privacy_guard.evaluator import PolicyEvaluator
 
-engine = RiskEngine(policy_name="default_us_privacy")
-result = engine.evaluate({
+config = {
     "provider": "openai",
-    "model": "gpt-4.1",
-    "deployment_region": "us-east-1",
-    "data_types": ["email", "product_feedback"],
+    "data_types": ["health_info", "product_feedback"],
     "stores_prompts": True,
-    "stores_outputs": False,
-    "end_users": "internal",
-    "use_case": "support_assistant"
-})
+}
 
+result = PolicyEvaluator("default_us_privacy").evaluate(config)
 print(result.to_dict())
 ```
 
-## Project Layout
+## Output Shape
+
+```json
+{
+  "policy_name": "default_us_privacy",
+  "findings": [
+    {
+      "rule_id": "US.SENSITIVE.THIRD_PARTY.HIGH_RISK",
+      "title": "High-risk sensitive data shared with third-party provider",
+      "severity": "high",
+      "enforcement": "block",
+      "reason": "High-risk sensitive data types are declared and sent to a third-party model provider.",
+      "evidence": {
+        "provider": "openai",
+        "high_risk_sensitive_data_types": ["health_info"],
+        "source_of_truth": "developer_declared_data_types"
+      },
+      "recommendations": [
+        "Avoid sending high-risk sensitive data to third-party model providers."
+      ]
+    }
+  ],
+  "summary": "1 policy finding(s) detected."
+}
+```
+
+## Architecture
 
 ```text
-ai-privacy-guard/
-  src/ai_privacy_guard/
-    checks/
-    policies/
-    cli.py
-    engine.py
-    models.py
-  examples/
-  tests/
+src/ai_privacy_guard/
+  models.py            # ScanConfig, PolicyRule, Finding, ScanResult
+  policy_loader.py     # YAML policy loading and validation
+  evaluator.py         # Rule iteration + check dispatch registry
+  checks/
+    sensitive_data_check.py
+  policies/
+    default_us_privacy.yaml
 ```
