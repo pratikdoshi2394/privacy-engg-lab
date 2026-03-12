@@ -22,8 +22,8 @@ class PolicyLoader:
         with path.open("r", encoding="utf-8") as handle:
             payload = yaml.safe_load(handle) or {}
 
-        if "name" not in payload:
-            raise ValueError("Policy YAML is missing required field: name")
+        if "policy_name" not in payload:
+            raise ValueError("Policy YAML is missing required field: policy_name")
         if "rules" not in payload:
             raise ValueError("Policy YAML is missing required field: rules")
         if not isinstance(payload["rules"], list):

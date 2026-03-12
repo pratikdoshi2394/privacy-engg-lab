@@ -45,6 +45,9 @@ See [`examples/sample_config.json`](examples/sample_config.json).
 Policy files live under `src/ai_privacy_guard/policies/`.
 
 The default pack (`default_us_privacy.yaml`) defines rules with:
+- top-level `policy_name`
+- top-level `version`
+- top-level `rules`
 - `rule_id`
 - `title`
 - `check`
@@ -86,7 +89,7 @@ print(result.to_dict())
   "policy_name": "default_us_privacy",
   "findings": [
     {
-      "rule_id": "US.SENSITIVE.THIRD_PARTY.HIGH_RISK",
+      "rule_id": "PRIV-SENS-001",
       "title": "High-risk sensitive data shared with third-party provider",
       "severity": "high",
       "enforcement": "block",

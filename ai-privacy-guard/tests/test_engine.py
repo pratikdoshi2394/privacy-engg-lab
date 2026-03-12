@@ -20,9 +20,9 @@ def _base_config(**overrides):
 def test_policy_loading_reads_rules():
     pack = PolicyLoader().load("default_us_privacy")
 
-    assert pack["name"] == "default_us_privacy"
+    assert pack["policy_name"] == "default_us_privacy"
     assert len(pack["rules"]) == 1
-    assert pack["rules"][0].rule_id == "US.SENSITIVE.THIRD_PARTY.HIGH_RISK"
+    assert pack["rules"][0].rule_id == "PRIV-SENS-001"
 
 
 def test_finding_triggers_for_high_risk_sensitive_data_with_third_party_provider():
@@ -34,7 +34,7 @@ def test_finding_triggers_for_high_risk_sensitive_data_with_third_party_provider
 
     assert len(result.findings) == 1
     finding = result.findings[0]
-    assert finding.rule_id == "US.SENSITIVE.THIRD_PARTY.HIGH_RISK"
+    assert finding.rule_id == "PRIV-SENS-001"
     assert finding.severity == "high"
 
 
