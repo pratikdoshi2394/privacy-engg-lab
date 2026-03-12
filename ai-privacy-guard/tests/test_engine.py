@@ -24,8 +24,8 @@ def test_policy_loading_reads_rules():
 
     assert pack["policy_name"] == "default_us_privacy"
     assert str(pack["version"]) == "0.1"
-    assert len(pack["rules"]) == 1
-    assert pack["rules"][0].rule_id == "PRIV-SENS-001"
+    assert len(pack["rules"]) == 2
+    assert {rule.rule_id for rule in pack["rules"]} == {"PRIV-DATA-001", "PRIV-SENS-001"}
 
 
 def test_policy_loading_fails_when_version_missing(tmp_path):
@@ -79,8 +79,7 @@ def test_finding_triggers_for_high_risk_sensitive_data_with_third_party_provider
         _base_config(data_types=["health_info", "race_ethnicity"], stores_prompts=True)
     )
 
-    assert len(result.findings) == 1
-    finding = result.findings[0]
+    finding = next(item for item in result.findings if item.rule_id == "PRIV-SENS-001")
     assert finding.rule_id == "PRIV-SENS-001"
     assert finding.severity == "high"
 
@@ -100,9 +99,42 @@ def test_finding_includes_evidence_enforcement_and_recommendations():
 
     result = evaluator.evaluate(_base_config(data_types=["ssn"], stores_prompts=True))
 
-    finding = result.findings[0]
+    finding = next(item for item in result.findings if item.rule_id == "PRIV-SENS-001")
     assert finding.enforcement == "block"
     assert finding.evidence["provider"] == "openai"
     assert finding.evidence["high_risk_sensitive_data_types"] == ["ssn"]
     assert isinstance(finding.recommendations, list)
     assert len(finding.recommendations) >= 1
+
+
+def test_missing_data_classification_triggers_when_data_types_empty():
+    evaluator = PolicyEvaluator("default_us_privacy")
+    result = evaluator.evaluate(_base_config(data_types=[]))
+
+    finding = next(item for item in result.findings if item.rule_id == "PRIV-DATA-001")
+    assert finding.severity == "medium"
+    assert finding.enforcement == "warn"
+    assert finding.reason == "No data classifications were declared for this AI integration."
+    assert finding.evidence == {
+        "declared_data_types": [],
+        "source_of_truth": "developer_declared_data_types",
+    }
+    assert len(finding.recommendations) == 3
+
+
+def test_missing_data_classification_triggers_when_data_types_missing():
+    evaluator = PolicyEvaluator("default_us_privacy")
+    payload = _base_config()
+    payload.pop("data_types")
+    result = evaluator.evaluate(payload)
+
+    finding = next(item for item in result.findings if item.rule_id == "PRIV-DATA-001")
+    assert finding.severity == "medium"
+    assert finding.enforcement == "warn"
+
+
+def test_missing_data_classification_not_triggered_when_data_types_declared():
+    evaluator = PolicyEvaluator("default_us_privacy")
+    result = evaluator.evaluate(_base_config(data_types=["product_feedback"]))
+
+    assert all(item.rule_id != "PRIV-DATA-001" for item in result.findings)

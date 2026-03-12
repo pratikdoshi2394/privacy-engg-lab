@@ -28,17 +28,23 @@ pip install .[dev]
 `apg` accepts a JSON config. Required fields for v1:
 
 - `provider`
-- `data_types`
 
 Supported optional fields include:
 - `model`
 - `deployment_region`
+- `data_types`
 - `stores_prompts`
 - `stores_outputs`
 - `end_users`
 - `use_case`
 
 See [`examples/sample_config.json`](examples/sample_config.json).
+
+## Missing Data Classification
+
+The default policy includes a `PRIV-DATA-001` rule that warns when `data_types`
+is missing or empty. Engineers should declare AI input data classifications so
+privacy review and controls can be applied before deployment.
 
 ## Policy Packs
 
