@@ -24,6 +24,8 @@ class PolicyLoader:
 
         if "policy_name" not in payload:
             raise ValueError("Policy YAML is missing required field: policy_name")
+        if "version" not in payload:
+            raise ValueError("Policy YAML is missing required field: version")
         if "rules" not in payload:
             raise ValueError("Policy YAML is missing required field: rules")
         if not isinstance(payload["rules"], list):

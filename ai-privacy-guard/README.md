@@ -87,6 +87,7 @@ print(result.to_dict())
 ```json
 {
   "policy_name": "default_us_privacy",
+  "policy_version": "0.1",
   "findings": [
     {
       "rule_id": "PRIV-SENS-001",

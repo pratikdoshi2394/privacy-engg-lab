@@ -20,6 +20,7 @@ class PolicyEvaluator:
         self.loader = PolicyLoader()
         self.policy_pack = self.loader.load(policy_name)
         self.policy_name = str(self.policy_pack["policy_name"])
+        self.policy_version = str(self.policy_pack["version"])
         self.rules = self.policy_pack["rules"]
 
     def evaluate(self, config_input: dict[str, Any] | ScanConfig) -> ScanResult:
@@ -57,7 +58,12 @@ class PolicyEvaluator:
             )
 
         summary = self._build_summary(findings)
-        return ScanResult(policy_name=self.policy_name, findings=findings, summary=summary)
+        return ScanResult(
+            policy_name=self.policy_name,
+            policy_version=self.policy_version,
+            findings=findings,
+            summary=summary,
+        )
 
     @staticmethod
     def _build_summary(findings: list[Finding]) -> str:
