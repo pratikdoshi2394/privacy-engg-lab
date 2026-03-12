@@ -1,3 +1,5 @@
+import pytest
+
 from ai_privacy_guard.evaluator import PolicyEvaluator
 from ai_privacy_guard.policy_loader import PolicyLoader
 
@@ -21,8 +23,31 @@ def test_policy_loading_reads_rules():
     pack = PolicyLoader().load("default_us_privacy")
 
     assert pack["policy_name"] == "default_us_privacy"
+    assert str(pack["version"]) == "0.1"
     assert len(pack["rules"]) == 1
     assert pack["rules"][0].rule_id == "PRIV-SENS-001"
+
+
+def test_policy_loading_fails_when_version_missing(tmp_path):
+    policy_file = tmp_path / "missing_version.yaml"
+    policy_file.write_text(
+        "policy_name: default_us_privacy\n"
+        "rules:\n"
+        "  - rule_id: PRIV-SENS-001\n"
+        "    title: Sensitive data sent to third-party AI provider\n"
+        "    check: sensitive_data_check\n"
+        "    severity: high\n"
+        "    enforcement: block\n"
+        "    recommendations:\n"
+        "      - Apply redaction or tokenization before sending data to the model\n",
+        encoding="utf-8",
+    )
+
+    loader = PolicyLoader(policies_dir=tmp_path)
+    loader._resolve_policy_path = lambda _: policy_file  # type: ignore[method-assign]
+
+    with pytest.raises(ValueError, match="missing required field: version"):
+        loader.load("missing_version")
 
 
 def test_finding_triggers_for_high_risk_sensitive_data_with_third_party_provider():
@@ -44,6 +69,7 @@ def test_no_finding_when_no_sensitive_data_matches():
     result = evaluator.evaluate(_base_config(data_types=["product_feedback", "preferences"]))
 
     assert result.findings == []
+    assert result.policy_version == "0.1"
     assert "No policy violations" in result.summary
 
 

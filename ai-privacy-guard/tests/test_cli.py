@@ -26,6 +26,7 @@ def test_cli_outputs_policy_scan_result(tmp_path, capsys):
     assert exit_code == 0
     payload = json.loads(captured.out)
     assert payload["policy_name"] == "default_us_privacy"
+    assert payload["policy_version"] == "0.1"
     assert isinstance(payload["findings"], list)
     assert "summary" in payload
 
