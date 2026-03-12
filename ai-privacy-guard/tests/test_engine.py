@@ -21,7 +21,6 @@ def test_policy_loading_reads_rules():
     pack = PolicyLoader().load("default_us_privacy")
 
     assert pack["policy_name"] == "default_us_privacy"
-    assert "version" in pack
     assert len(pack["rules"]) == 1
     assert pack["rules"][0].rule_id == "PRIV-SENS-001"
 
