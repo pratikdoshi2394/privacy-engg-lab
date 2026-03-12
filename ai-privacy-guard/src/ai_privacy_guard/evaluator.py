@@ -19,7 +19,7 @@ class PolicyEvaluator:
     def __init__(self, policy_name: str = "default_us_privacy") -> None:
         self.loader = PolicyLoader()
         self.policy_pack = self.loader.load(policy_name)
-        self.policy_name = str(self.policy_pack["name"])
+        self.policy_name = str(self.policy_pack["policy_name"])
         self.rules = self.policy_pack["rules"]
 
     def evaluate(self, config_input: dict[str, Any] | ScanConfig) -> ScanResult:
