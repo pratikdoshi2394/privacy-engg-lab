@@ -90,7 +90,7 @@ print(result.to_dict())
   "findings": [
     {
       "rule_id": "PRIV-SENS-001",
-      "title": "High-risk sensitive data shared with third-party provider",
+      "title": "Sensitive data sent to third-party AI provider",
       "severity": "high",
       "enforcement": "block",
       "reason": "High-risk sensitive data types are declared and sent to a third-party model provider.",
@@ -100,7 +100,9 @@ print(result.to_dict())
         "source_of_truth": "developer_declared_data_types"
       },
       "recommendations": [
-        "Avoid sending high-risk sensitive data to third-party model providers."
+        "Apply redaction or tokenization before sending data to the model",
+        "Use an approved internal deployment or documented exception",
+        "Require privacy review before production release"
       ]
     }
   ],
