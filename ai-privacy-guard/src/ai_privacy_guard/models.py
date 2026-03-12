@@ -19,10 +19,9 @@ class ScanConfig:
     def from_dict(cls, payload: dict[str, Any]) -> "ScanConfig":
         if "provider" not in payload:
             raise ValueError("Missing required config field: provider")
-        if "data_types" not in payload:
-            raise ValueError("Missing required config field: data_types")
-
-        raw_data_types = payload["data_types"]
+        raw_data_types = payload.get("data_types", [])
+        if raw_data_types is None:
+            raw_data_types = []
         if not isinstance(raw_data_types, list) or not all(
             isinstance(item, str) for item in raw_data_types
         ):

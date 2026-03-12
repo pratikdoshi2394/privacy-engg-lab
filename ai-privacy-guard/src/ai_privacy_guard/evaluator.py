@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Callable, Optional
 
-from ai_privacy_guard.checks import sensitive_data_check
+from ai_privacy_guard.checks import (
+    missing_data_classification_check,
+    sensitive_data_check,
+)
 from ai_privacy_guard.models import Finding, ScanConfig, ScanResult
 from ai_privacy_guard.policy_loader import PolicyLoader
 
@@ -10,6 +13,7 @@ CheckFn = Callable[[ScanConfig, Any], Optional[dict[str, Any]]]
 
 CHECK_REGISTRY: dict[str, CheckFn] = {
     "sensitive_data_check": sensitive_data_check,
+    "missing_data_classification_check": missing_data_classification_check,
 }
 
 

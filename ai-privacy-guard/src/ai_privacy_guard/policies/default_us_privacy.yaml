@@ -2,6 +2,18 @@ policy_name: "default_us_privacy"
 version: 0.1
 
 rules:
+  - rule_id: "PRIV-DATA-001"
+    title: Missing AI input data classification
+    description: AI integrations must declare the types of data sent to models before deployment.
+    check: missing_data_classification_check
+    severity: medium
+    enforcement: warn
+    params: {}
+    recommendations:
+      - Declare data_types in the AI integration configuration
+      - Classify whether personal or sensitive data may be sent to the model
+      - Require privacy review if sensitive data is involved
+
   - rule_id: "PRIV-SENS-001"
     title: Sensitive data sent to third-party AI provider
     description: High-risk sensitive data should not be sent to third-party AI providers without mitigation.
