@@ -1,8 +1,8 @@
-policy_name: default_us_privacy
+policy_name: "default_us_privacy"
 version: 0.1
 
 rules:
-  - rule_id: PRIV-SENS-001
+  - rule_id: "PRIV-SENS-001"
     title: Sensitive data sent to third-party AI provider
     description: High-risk sensitive data should not be sent to third-party AI providers without mitigation.
     check: sensitive_data_check
