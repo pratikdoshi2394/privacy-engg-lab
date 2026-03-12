@@ -1,13 +1,10 @@
 {
   "provider": "openai",
-  "model": "gpt-4.1",
-  "deployment_region": "us-east-1",
-  "data_types": [
-    "health_info",
-    "product_feedback"
-  ],
+  "model": "gpt-4o",
+  "deployment_region": "us",
+  "data_types": ["health_info", "email"],
   "stores_prompts": true,
   "stores_outputs": false,
-  "end_users": "internal",
-  "use_case": "support_assistant"
+  "end_users": "consumers",
+  "use_case": "customer support summarization"
 }
