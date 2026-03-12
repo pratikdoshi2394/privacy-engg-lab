@@ -123,12 +123,14 @@ class Finding:
 @dataclass
 class ScanResult:
     policy_name: str
+    policy_version: str
     findings: list[Finding]
     summary: str
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "policy_name": self.policy_name,
+            "policy_version": self.policy_version,
             "findings": [finding.to_dict() for finding in self.findings],
             "summary": self.summary,
         }
