@@ -34,7 +34,6 @@ class PolicyLoader:
         payload["rules"] = [PolicyRule.from_dict(rule) for rule in payload["rules"]]
         return payload
 
-    @staticmethod
-    def _resolve_policy_path(policy_name: str) -> Path:
+    def _resolve_policy_path(self, policy_name: str) -> Path:
         filename = policy_name if policy_name.endswith(".yaml") else f"{policy_name}.yaml"
-        return Path(__file__).resolve().parent / "policies" / filename
+        return self.policies_dir / filename
