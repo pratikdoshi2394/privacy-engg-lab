@@ -1,19 +1,41 @@
-name: default_us_privacy
-version: 1
-description: >
-  Baseline US privacy policy pack focused on developer-declared data types
-  and third-party model providers.
+policy_pack: default_us_privacy
+version: 0.1
+
 rules:
-  - rule_id: US.SENSITIVE.THIRD_PARTY.HIGH_RISK
-    title: High-risk sensitive data shared with third-party provider
-    description: >
-      Triggers when developer-declared high-risk sensitive data types are
-      sent to a known third-party model provider.
+  - id: PRIV-SENS-001
+    title: Sensitive data sent to third-party AI provider
+    description: High-risk sensitive data should not be sent to third-party AI providers without mitigation.
     check: sensitive_data_check
     severity: high
     enforcement: block
+    params:
+      provider_types:
+        third_party:
+          - openai
+          - anthropic
+          - google
+          - cohere
+          - mistral
+          - bedrock
+      high_risk_data_types:
+        - health_info
+        - financial_info
+        - ssn
+        - child_data
+        - biometric_data
+        - government_id
+      sensitive_data_types:
+        - health_info
+        - financial_info
+        - ssn
+        - precise_location
+        - child_data
+        - biometric_data
+        - government_id
+        - race_ethnicity
+        - sexual_orientation
+        - religious_belief
     recommendations:
-      - Avoid sending high-risk sensitive data to third-party model providers.
-      - Replace direct identifiers with redacted or tokenized values.
-      - Route this use case through an approved self-hosted or isolated path.
-    enabled: true
+      - Apply redaction or tokenization before sending data to the model
+      - Use an approved internal deployment or documented exception
+      - Require privacy review before production release
