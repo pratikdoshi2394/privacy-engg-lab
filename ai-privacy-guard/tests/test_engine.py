@@ -44,10 +44,32 @@ def test_policy_loading_fails_when_version_missing(tmp_path):
     )
 
     loader = PolicyLoader(policies_dir=tmp_path)
-    loader._resolve_policy_path = lambda _: policy_file  # type: ignore[method-assign]
 
     with pytest.raises(ValueError, match="missing required field: version"):
         loader.load("missing_version")
+
+
+def test_policy_loading_uses_injected_policies_dir(tmp_path):
+    policy_file = tmp_path / "custom_policy.yaml"
+    policy_file.write_text(
+        "policy_name: custom_policy\n"
+        "version: 0.1\n"
+        "rules:\n"
+        "  - rule_id: PRIV-SENS-001\n"
+        "    title: Sensitive data sent to third-party AI provider\n"
+        "    check: sensitive_data_check\n"
+        "    severity: high\n"
+        "    enforcement: block\n"
+        "    recommendations:\n"
+        "      - Apply redaction or tokenization before sending data to the model\n",
+        encoding="utf-8",
+    )
+
+    pack = PolicyLoader(policies_dir=tmp_path).load("custom_policy")
+
+    assert pack["policy_name"] == "custom_policy"
+    assert str(pack["version"]) == "0.1"
+    assert pack["rules"][0].rule_id == "PRIV-SENS-001"
 
 
 def test_finding_triggers_for_high_risk_sensitive_data_with_third_party_provider():
