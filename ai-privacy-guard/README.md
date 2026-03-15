@@ -73,6 +73,15 @@ Use a named policy pack:
 apg --config examples/sample_config.json --policy default_us_privacy
 ```
 
+CI/CD fail-gate usage:
+
+```bash
+apg --config examples/sample_config.json --policy default_us_privacy --fail-on block
+```
+
+Findings are always printed in JSON output. `--fail-on` only controls whether
+the process exits with a non-zero status when matching enforcement levels are found.
+
 ## Python Usage
 
 ```python
