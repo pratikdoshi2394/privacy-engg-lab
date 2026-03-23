@@ -10,7 +10,7 @@ against YAML policy packs to produce evidence-backed findings.
 - Developer-declared data types as v1 source of truth
 - Rule evaluation with check registry dispatch
 - Evidence-backed findings with policy-defined recommendations
-- Enforcement metadata per finding (`monitor`, `warn`, `block`)
+- Enforcement metadata per finding (`allow`, `warn`, `review`, `block`)
 
 No runtime prompt scanning is implemented yet.
 
@@ -72,6 +72,34 @@ Use a named policy pack:
 ```bash
 apg --config examples/sample_config.json --policy default_us_privacy
 ```
+
+CI/CD fail-gate usage:
+
+```bash
+apg --config examples/sample_config.json --policy default_us_privacy --fail-on block
+```
+
+Findings are always printed in JSON output. `--fail-on` only controls whether
+the process exits with a non-zero status when matching enforcement levels are found.
+
+### Enforcement Ordering
+
+Enforcement thresholds are ordered as:
+
+`allow < warn < review < block`
+
+When `--fail-on` is set, the scanner exits non-zero if any finding's enforcement
+level meets or exceeds the configured threshold. Findings are always returned.
+
+### Using ai-privacy-guard in CI
+
+```bash
+apg --config examples/sample_config.json \
+    --policy default_us_privacy \
+    --fail-on block
+```
+
+If a rule with enforcement `block` is triggered, the process exits with a non-zero status.
 
 ## Python Usage
 
